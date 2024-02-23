@@ -1,0 +1,37 @@
+name:                xxx-dbus-app-launcher
+version:             0.1.0.0
+author:              "Daniël van de Giessen"
+maintainer:          "daniel@dvdgiessen.nl"
+copyright:           "2024 Daniël van de Giessen"
+
+extra-source-files:
+- README.md
+
+description:         Simple app launcher via DBus
+
+dependencies:
+- base >= 4.7 && < 5
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wmissing-home-modules
+- -Wpartial-fields
+- -Wredundant-constraints
+
+executables:
+  xxx-dbus-app-launcher-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - dbus
+    - process
+
