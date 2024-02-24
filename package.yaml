@@ -33,5 +33,6 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - dbus
-    - process
+    - extra
+    - unix
 
