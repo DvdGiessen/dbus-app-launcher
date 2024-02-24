@@ -6,45 +6,51 @@ import           Control.Concurrent (threadDelay)
 import           Control.Concurrent.Chan
 import           Control.Exception.Extra (ignore)
 import           Control.Monad
+import           Data.Map
 import           DBus.Client
 import           System.Exit
 import           System.Posix.Process
 
 main :: IO ()
 main = do
-    -- Set up session
+    -- Connect to D-Bus
     client <- connectSession
 
-    -- Channel for transfering the process to launch from the callback thread
+    -- Channel for transfering exec parameters from the callback thread
     channel <- newChan
     
     -- Export object used for launching programs
     export client "/" defaultInterface
              { interfaceName = "nl.dvdgiessen.dbusapplauncher.Exec"
              , interfaceMethods =
-               [ autoMethod "Exec" (\ cmd -> (writeChan channel (cmd, [], Nothing))) ]
+               [ autoMethod "Cmd" (\ cmd -> (writeChan channel (cmd, [], Nothing)))
+               , autoMethod "CmdArgs" (\ cmd args -> (writeChan channel (cmd, args, Nothing)))
+               , autoMethod "CmdArgsEnv" (\ cmd args env -> (writeChan channel (cmd, args, Just (toList env))))
+               ]
              }
 
-    -- Connect session to bus
+    -- Register our service
     requestResult <- requestName client "nl.dvdgiessen.dbusapplauncher" []
     when (requestResult /= NamePrimaryOwner) $ do
         putStrLn "Another service owns the \"nl.dvdgiessen.dbusapplauncher\" bus name"
         exitFailure
 
-    -- Retrieve the command to launch from the callback
+    -- Wait for the callback thread to return the exec parameters
     (cmd, args, env) <- readChan channel
 
-    -- Give the thread one millisecond to return its result
+    -- Do not accept any additional calls
+    unexport client "/"
+
+    -- Give the callback thread one millisecond to return its result before we kill it
     threadDelay 1000
 
-    -- Disconnect the session
-    unexport client "/Launch"
+    -- Disconnect from D-Bus, killing the callback thread
     disconnect client
 
-    -- Make sure we are in our own session
+    -- Make sure we are in our own process group and session
     ignore (do _ <- createSession; return ())
 
-    -- Execute the received command
+    -- Exec with the requested parameters
     _ <- executeFile cmd True args env
 
     -- Never reached
