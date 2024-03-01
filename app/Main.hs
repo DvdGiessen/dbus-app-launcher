@@ -20,7 +20,7 @@ main = do
     channel <- newChan
     
     -- Export object used for launching programs
-    export client "/" defaultInterface
+    export client "/nl/dvdgiessen/DBusAppLauncher" defaultInterface
              { interfaceName = "nl.dvdgiessen.dbusapplauncher.Exec"
              , interfaceMethods =
                [ autoMethod "Cmd" (\ cmd -> (writeChan channel (cmd, [], Nothing)))
@@ -39,7 +39,7 @@ main = do
     (cmd, args, env) <- readChan channel
 
     -- Do not accept any additional calls
-    unexport client "/"
+    unexport client "/nl/dvdgiessen/DBusAppLauncher"
 
     -- Give the callback thread one millisecond to return its result before we kill it
     threadDelay 1000

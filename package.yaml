@@ -1,4 +1,4 @@
-name:                xxx-dbus-app-launcher
+name:                dbus-app-launcher
 version:             0.1.0.0
 author:              "Daniël van de Giessen"
 maintainer:          "daniel@dvdgiessen.nl"
@@ -7,7 +7,7 @@ copyright:           "2024 Daniël van de Giessen"
 extra-source-files:
 - README.md
 
-description:         Simple app launcher via DBus
+description:         Simple app launcher for D-Bus
 
 dependencies:
 - base >= 4.7 && < 5
@@ -24,10 +24,11 @@ ghc-options:
 - -Wredundant-constraints
 
 executables:
-  xxx-dbus-app-launcher-exe:
+  dbus-app-launcher:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
+    - -O2
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
