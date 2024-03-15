@@ -1,0 +1,40 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.35.2.
+--
+-- see: https://github.com/sol/hpack
+
+name:           dbus-app-launcher
+version:        0.1.0.0
+synopsis:       Simple app launcher for D-Bus
+description:    See the README at <https://github.com/DvdGiessen/dbus-app-launcher>
+category:       System
+homepage:       https://github.com/DvdGiessen/dbus-app-launcher#readme
+bug-reports:    https://github.com/DvdGiessen/dbus-app-launcher/issues
+author:         Daniël van de Giessen
+maintainer:     daniel@dvdgiessen.nl
+copyright:      2024 Daniël van de Giessen
+license:        MIT
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/DvdGiessen/dbus-app-launcher
+
+executable dbus-app-launcher
+  main-is: Main.hs
+  other-modules:
+      Paths_dbus_app_launcher
+  hs-source-dirs:
+      app
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , dbus
+    , extra
+    , unix
+  default-language: Haskell2010

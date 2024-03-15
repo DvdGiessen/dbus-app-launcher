@@ -1,13 +1,17 @@
-name:                dbus-app-launcher
-version:             0.1.0.0
-author:              "Daniël van de Giessen"
-maintainer:          "daniel@dvdgiessen.nl"
-copyright:           "2024 Daniël van de Giessen"
+name: dbus-app-launcher
+version: 0.1.0.0
+
+synopsis: "Simple app launcher for D-Bus"
+description: "See the README at <https://github.com/DvdGiessen/dbus-app-launcher>"
+category: System
+
+author: Daniël van de Giessen
+maintainer: daniel@dvdgiessen.nl
+github: DvdGiessen/dbus-app-launcher
+copyright: "2024 Daniël van de Giessen"
 
 extra-source-files:
 - README.md
-
-description:         Simple app launcher for D-Bus
 
 dependencies:
 - base >= 4.7 && < 5
@@ -23,18 +27,19 @@ ghc-options:
 - -Wpartial-fields
 - -Wredundant-constraints
 
+pvp-bounds: both
+
 executables:
   dbus-app-launcher:
-    main:                Main.hs
-    source-dirs:         app
+    main: Main.hs
+    source-dirs: app
     ghc-options:
-    - -O2
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
     dependencies:
-    - containers
-    - dbus
-    - extra
-    - unix
+      - containers
+      - dbus
+      - extra
+      - unix
 
