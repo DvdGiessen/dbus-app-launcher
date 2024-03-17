@@ -27,8 +27,6 @@ ghc-options:
 - -Wpartial-fields
 - -Wredundant-constraints
 
-pvp-bounds: both
-
 executables:
   dbus-app-launcher:
     main: Main.hs
