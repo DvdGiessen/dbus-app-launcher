@@ -7,14 +7,58 @@ risk. Use carefully.
 
 ## Installation
 
+There is a number of ways to install. Choose one and follow the given steps.
+
+The following installation options provide a complete package which already
+include a D-Bus service configuration file, so require no extra steps after
+installing:
+
+- Install from the Arch User Repository (AUR):
+  [`dbus-app-launcher`](https://aur.archlinux.org/packages/dbus-app-launcher)
+
+The following installation options only provide you with the executable and
+leave it up to you to set up the D-Bus service configuration file, for which
+you will need to follow the steps in the section below:
+
+- Download a static binary from the
+  [releases page](https://github.com/DvdGiessen/dbus-app-launcher/releases).
+- Install from Hackage:
+  [`dbus-app-launcher`](https://hackage.haskell.org/package/dbus-app-launcher)
+
+If none of the above options work for you, you can also follow the instructions
+below to build the executable from source yourself.
+
+### Building from source
+
 To build the code, you will need Haskell and the `stack` command line utility.
-Get it [here](https://docs.haskellstack.org/en/stable/).
+Get them [here](https://docs.haskellstack.org/en/stable/).
 
 To build and install, run `stack install`. This will build the code and copy the
 executable to `~/.local/bin`.
 
-Next, set up a D-Bus service description that will automatically launch the new
-service whenever it is accessed:
+Next, follow the steps to set up the D-Bus service.
+
+### Build a static executable using Docker
+
+To build a static executable (the same as made available on the releases page),
+you can use the following Docker command:
+
+```sh
+docker run -v $PWD:/dbus-app-launcher --rm benz0li/ghc-musl:9.6.4 sh -c "cd /dbus-app-launcher && exec stack --allow-different-user build --no-install-ghc --system-ghc --ghc-options='-static -optl-static'"
+```
+
+This will start a [`ghc-musl`](https://github.com/benz0li/ghc-musl) container,
+mount the current directory (where you've checked out the code) into it, and
+build a statically linked version of the service which should be able to run on
+any system with the same CPU architecture.
+
+When the build succeeded, the executable can be found at the following path:
+`.stack-work/dist/x86_64-linux/ghc-9.6.4/build/dbus-app-launcher/dbus-app-launcher`
+
+### Setting up the D-Bus service configuration
+
+To set up a D-Bus service description that will automatically launch the new
+service whenever it is accessed, create the following file:
 
 `/usr/share/dbus-1/services/nl.dvdgiessen.dbusapplauncher.service`
 
@@ -24,7 +68,9 @@ Name=nl.dvdgiessen.dbusapplauncher
 Exec=/home/USERNAME/.local/bin/dbus-app-launcher
 ```
 
-## Using the service
+Replace the path in `Exec=` with the actual location of the executable.
+
+## Using the D-Bus service from your own code
 
 The service currently exports one interface, `Exec`. Calling any of the methods
 of this interface will start the program using the `exec()` syscall.
