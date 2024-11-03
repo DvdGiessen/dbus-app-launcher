@@ -6,8 +6,12 @@ import           Control.Concurrent (threadDelay)
 import           Control.Concurrent.Chan
 import           Control.Exception.Extra (ignore)
 import           Control.Monad
+import           Data.Either
+import           Data.List (uncons)
 import           Data.Map
+import           Data.Maybe (fromMaybe)
 import           DBus.Client
+import           ShellWords (parse)
 import           System.Exit
 import           System.Posix.Process
 
@@ -18,14 +22,14 @@ main = do
 
     -- Channel for transfering exec parameters from the callback thread
     channel <- newChan
-    
+
     -- Export object used for launching programs
     export client "/nl/dvdgiessen/DBusAppLauncher" defaultInterface
              { interfaceName = "nl.dvdgiessen.dbusapplauncher.Exec"
              , interfaceMethods =
-               [ autoMethod "Cmd" (\ cmd -> (writeChan channel (cmd, [], Nothing)))
-               , autoMethod "CmdArgs" (\ cmd args -> (writeChan channel (cmd, args, Nothing)))
-               , autoMethod "CmdArgsEnv" (\ cmd args env -> (writeChan channel (cmd, args, Just (toList env))))
+               [ autoMethod "Cmd" (\ cmd -> (writeChan channel (uncurry (,,) (fromMaybe (cmd, []) (uncons (fromRight [] (parse cmd)))) Nothing)))
+               , autoMethod "CmdArgs" (\ cmd args -> (writeChan channel (uncurry (,,) (fromMaybe (cmd, args) (uncons (concat (rights [(parse cmd), Right args])))) Nothing)))
+               , autoMethod "CmdArgsEnv" (\ cmd args env -> (writeChan channel (uncurry (,,) (fromMaybe (cmd, args) (uncons (concat (rights [(parse cmd), Right args])))) (Just (toList env)))))
                ]
              }
 
@@ -55,4 +59,3 @@ main = do
 
     -- Never reached
     return ()
-
