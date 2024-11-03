@@ -60,7 +60,7 @@ When the build succeeded, the executable can be found at the following path:
 To set up a D-Bus service description that will automatically launch the new
 service whenever it is accessed, create the following file:
 
-`/usr/share/dbus-1/services/nl.dvdgiessen.dbusapplauncher.service`
+`~/.local/share/dbus-1/services/nl.dvdgiessen.dbusapplauncher.service`
 
 ```ini
 [D-BUS Service]
