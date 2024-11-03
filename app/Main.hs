@@ -8,12 +8,29 @@ import           Control.Exception.Extra (ignore)
 import           Control.Monad
 import           Data.Either
 import           Data.List (uncons)
-import           Data.Map
+import           Data.Map.Strict (fromList, toList)
 import           Data.Maybe (fromMaybe)
 import           DBus.Client
 import           ShellWords (parse)
+import           System.Environment (getEnvironment)
 import           System.Exit
 import           System.Posix.Process
+import           Text.Regex.TDFA
+
+splitEnv :: [String] -> ([String], [String])
+splitEnv = span (\ s -> ((s =~ ("[a-zA-Z_][a-zA-Z0-9_]*=" :: String)) :: Bool))
+
+parseEnv :: [String] -> [(String, String)]
+parseEnv = map ((\ (k, _, v) -> (k, v)) . (\ d -> ((d =~ ("=" :: String)) :: (String, String, String))) )
+
+uniqEnv :: [[(String, String)]] -> [(String, String)]
+uniqEnv envs = toList (fromList (concat envs))
+
+parseCmd :: String -> [String] -> [(String, String)] -> (String, [String], [(String, String)])
+parseCmd cmd args env = (\ (a, b)
+   -> uncurry
+        (,,) (fromMaybe (cmd, args) (uncons (b ++ args)))
+        (uniqEnv [parseEnv a, env])) (splitEnv (fromRight [] (parse cmd)))
 
 main :: IO ()
 main = do
@@ -27,9 +44,9 @@ main = do
     export client "/nl/dvdgiessen/DBusAppLauncher" defaultInterface
              { interfaceName = "nl.dvdgiessen.dbusapplauncher.Exec"
              , interfaceMethods =
-               [ autoMethod "Cmd" (\ cmd -> (writeChan channel (uncurry (,,) (fromMaybe (cmd, []) (uncons (fromRight [] (parse cmd)))) Nothing)))
-               , autoMethod "CmdArgs" (\ cmd args -> (writeChan channel (uncurry (,,) (fromMaybe (cmd, args) (uncons (concat (rights [(parse cmd), Right args])))) Nothing)))
-               , autoMethod "CmdArgsEnv" (\ cmd args env -> (writeChan channel (uncurry (,,) (fromMaybe (cmd, args) (uncons (concat (rights [(parse cmd), Right args])))) (Just (toList env)))))
+               [ autoMethod "Cmd" (\ cmd -> writeChan channel (parseCmd cmd [] []))
+               , autoMethod "CmdArgs" (\ cmd args -> writeChan channel (parseCmd cmd args []))
+               , autoMethod "CmdArgsEnv" (\ cmd args env -> writeChan channel (parseCmd cmd args (toList env)))
                ]
              }
 
@@ -54,8 +71,11 @@ main = do
     -- Make sure we are in our own process group and session
     ignore (do _ <- createSession; return ())
 
+    -- Environment that spawned processes will inherit
+    globalEnv <- getEnvironment
+
     -- Exec with the requested parameters
-    _ <- executeFile cmd True args env
+    _ <- executeFile cmd True args (Just (uniqEnv [globalEnv, env]))
 
     -- Never reached
     return ()
