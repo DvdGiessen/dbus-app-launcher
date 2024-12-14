@@ -1,5 +1,5 @@
 name: dbus-app-launcher
-version: 0.1.0.0
+version: 0.1.1.0
 
 synopsis: "Simple app launcher for D-Bus"
 description: "See the README at <https://github.com/DvdGiessen/dbus-app-launcher>"

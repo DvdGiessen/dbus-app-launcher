@@ -44,7 +44,7 @@ To build a static executable (the same as made available on the releases page),
 you can use the following Docker command:
 
 ```sh
-docker run -v $PWD:/dbus-app-launcher --rm benz0li/ghc-musl:9.6.4 sh -c "cd /dbus-app-launcher && exec stack --allow-different-user build --no-install-ghc --system-ghc --ghc-options='-static -optl-static'"
+docker run -v $PWD:/dbus-app-launcher --rm benz0li/ghc-musl:9.8.4 sh -c "cd /dbus-app-launcher && exec stack --allow-different-user build --no-install-ghc --system-ghc --ghc-options='-static -optl-static'"
 ```
 
 This will start a [`ghc-musl`](https://github.com/benz0li/ghc-musl) container,
@@ -53,7 +53,7 @@ build a statically linked version of the service which should be able to run on
 any system with the same CPU architecture.
 
 When the build succeeded, the executable can be found at the following path:
-`.stack-work/dist/x86_64-linux/ghc-9.6.4/build/dbus-app-launcher/dbus-app-launcher`
+`.stack-work/dist/x86_64-linux/ghc-9.8.4/build/dbus-app-launcher/dbus-app-launcher`
 
 ### Setting up the D-Bus service configuration
 
