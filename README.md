@@ -14,7 +14,10 @@ include a D-Bus service configuration file, so require no extra steps after
 installing:
 
 - Install from the Arch User Repository (AUR):
-  [`dbus-app-launcher`](https://aur.archlinux.org/packages/dbus-app-launcher)
+  - [`dbus-app-launcher-bin`](https://aur.archlinux.org/packages/dbus-app-launcher-bin)
+    (statically linked binary, recommended)
+  - [`dbus-app-launcher`](https://aur.archlinux.org/packages/dbus-app-launcher)
+    (builds from source, may require re-building when dependencies are updated)
 
 The following installation options only provide you with the executable and
 leave it up to you to set up the D-Bus service configuration file, for which
