@@ -39,7 +39,7 @@ Get them [here](https://docs.haskellstack.org/en/stable/).
 To build and install, run `stack install`. This will build the code and copy the
 executable to `~/.local/bin`.
 
-Next, follow the steps to set up the D-Bus service.
+Next, follow the steps below to set up the D-Bus service.
 
 ### Build a static executable using Docker
 
@@ -85,6 +85,18 @@ of this interface will start the program using the `exec()` syscall.
   - `Cmd(String cmd)`
   - `CmdArgs(String cmd, List<String> args)`
   - `CmdArgsEnv(String cmd, List<String> args, Map<String,String> env)`
+
+Note: The `cmd` parameter is always parsed using shell-style quoting,
+supporting specifying environment variables by prepending them to the command
+(`NAME=value`) and arguments by appending them after the command. Other shell
+features such as variable interpolation are *not* supported.
+
+Arguments from the optional `args` parameter will be added after any arguments
+parsed from the `cmd` parameter.
+
+The launched program will inherit the environment that `dbus-app-launcher`
+itself was started with, and can be overridden by environment variables parsed
+from the `cmd` parameter. Both of those can be overriden via the `env` parameter.
 
 ## Issues and contributing
 
